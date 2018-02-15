@@ -66,6 +66,12 @@ if (!$ilDB->tableExists("il_qpl_a_errortextq")) {
         ),
         "sequence" => array(
             "type" => "integer", "length" => 2, "notnull" => true, "default" => 0
+        ),
+        "start_position" => array(
+            "type" => "float", "notnull" => true, "default" => 0
+        ),
+        "error_length" => array(
+            "type" => "float", "notnull" => true, "default" => 0
         )
     );
     $ilDB->createTable("il_qpl_a_errortextq", $fields);

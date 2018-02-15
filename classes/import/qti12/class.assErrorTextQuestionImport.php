@@ -52,7 +52,7 @@ class assErrorTextQuestionImport extends assQuestionImport
         $errordata = unserialize($item->getMetadataEntry("errordata"));
         if (is_array($errordata)) {
             foreach ($errordata as $data) {
-                $this->object->addErrorData($data[1], $data[0], $data[2]);
+                $this->object->addErrorData($data[1], $data[0], $data[2], $data[3], $data[4]);
             }
         }
         // additional content editing mode information

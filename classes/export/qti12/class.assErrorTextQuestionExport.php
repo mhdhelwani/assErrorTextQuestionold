@@ -74,7 +74,8 @@ class assErrorTextQuestionExport extends assQuestionExport
         $a_xml_writer->xmlElement("fieldlabel", NULL, "errordata");
         $serialized = array();
         foreach ($this->object->getErrorData() as $data) {
-            array_push($serialized, array($data->text_correct, $data->text_wrong, $data->points));
+            array_push($serialized,
+                [$data->text_correct, $data->text_wrong, $data->points, $data->start_position, $data->error_length]);
         }
         $a_xml_writer->xmlElement("fieldentry", NULL, serialize($serialized));
         $a_xml_writer->xmlEndTag("qtimetadatafield");
