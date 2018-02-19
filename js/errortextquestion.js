@@ -5,20 +5,20 @@ $().ready(function () {
         var nodeType = range.commonAncestorContainer.nodeType;
         if (nodeType == 3) {
             var parent = selection.anchorNode.parentElement;
-            var peTagName =parent.tagName;
+            var peTagName = parent.tagName;
             if (peTagName.toLowerCase() == "span") {
                 range.selectNode(parent);
                 selectedText = range.toString();
                 range.deleteContents();
                 range.insertNode(document.createTextNode(selectedText));
             } else {
-                    var selectedText = range.extractContents();
-                    if (selectedText.textContent) {
-                        var span = document.createElement("span");
-                        span.className = "sel";
-                        span.appendChild(selectedText);
-                        range.insertNode(span);
-                    }
+                var selectedText = range.extractContents();
+                if (selectedText.textContent) {
+                    var span = document.createElement("span");
+                    span.className = "sel";
+                    span.appendChild(selectedText);
+                    range.insertNode(span);
+                }
             }
         }
         var context = $(selection.baseNode).closest("div.errortext");
@@ -31,4 +31,10 @@ $().ready(function () {
         e.preventDefault();
         e.stopPropagation();
     });
+
+    $("#text_direction").change(function (e) {
+        $("#errortext").parent().attr("dir", $(this).val());
+    });
+
+    $("#errortext").parent().attr("dir",  $("#text_direction").val());
 });

@@ -88,6 +88,7 @@ class assErrorTextQuestionGUI extends assQuestionGUI implements ilGuiQuestionSco
             if ($errors) $checkonly = false;
         }
 
+        $this->tpl->addJavascript($this->plugin->getDirectory() . "/js/errortextquestion.js");
         if (!$checkonly) $this->tpl->setVariable("QUESTION_DATA", $form->getHTML());
         return $errors;
     }
@@ -126,6 +127,11 @@ class assErrorTextQuestionGUI extends assQuestionGUI implements ilGuiQuestionSco
      */
     public function populateQuestionSpecificFormPart(ilPropertyFormGUI $form)
     {
+        $langDirection = new ilSelectInputGUI($this->plugin->txt("text_direction"), "text_direction");
+        $langDirection->setOptions(["LTR" => "LTR", "RTL" => "RTL"]);
+        $langDirection->setValue($this->object->getTextDirection());
+        $form->addItem($langDirection);
+
         // errortext
         $errortext = new ilTextAreaInputGUI($this->lng->txt("errortext"), "errortext");
         $errortext->setValue($this->object->getErrorText());
@@ -203,6 +209,7 @@ class assErrorTextQuestionGUI extends assQuestionGUI implements ilGuiQuestionSco
         if (strlen($points_wrong) == 0)
             $points_wrong = -1.0;
         $this->object->setPointsWrong($points_wrong);
+        $this->object->setTextDirection($_POST["text_direction"]);
 
         if (!$this->object->getSelfAssessmentEditingMode()) {
             $this->object->setTextSize($_POST["textsize"]);
@@ -232,9 +239,9 @@ class assErrorTextQuestionGUI extends assQuestionGUI implements ilGuiQuestionSco
                 $selectionPosition = explode(",", $solution["value2"]);
 
                 $selections[$selectionPosition[0]] = [
-                        "selectedText" => $solution['value1'],
-                        "selectionStart" => $selectionPosition[0],
-                        "selectionLength" => $selectionPosition[1]];
+                    "selectedText" => $solution['value1'],
+                    "selectionStart" => $selectionPosition[0],
+                    "selectionLength" => $selectionPosition[1]];
             }
             krsort($selections);
         }
@@ -242,9 +249,10 @@ class assErrorTextQuestionGUI extends assQuestionGUI implements ilGuiQuestionSco
         if ($this->object->getTextSize() >= 10) {
             $style .= ' font-size: ' . $this->object->getTextSize() . '%;';
         }
-        $style .= '"';
+        $style .= "direction:" . $this->object->getTextDirection() . ';"';
 
         $template->setVariable("STYLE", $style);
+        $template->setVariable("DIR", $this->object->getTextDirection());
         $template->setVariable("QUESTIONTEXT", $this->object->prepareTextareaOutput($this->object->getQuestion(), TRUE));
         $errortext = $this->object->createErrorTextOutput($selections);
         $this->ctrl->setParameterByClass($this->getTargetGuiClass(), 'errorvalue', '');
@@ -274,8 +282,10 @@ class assErrorTextQuestionGUI extends assQuestionGUI implements ilGuiQuestionSco
         if ($this->object->getTextSize() >= 10) {
             $style .= ' font-size: ' . $this->object->getTextSize() . '%;';
         }
-        $style .= '"';
+        $style .= "direction:" . $this->object->getTextDirection() . ';"';
+
         $template->setVariable("STYLE", $style);
+        $template->setVariable("DIR", $this->object->getTextDirection());
 
         $template->setVariable("QUESTIONTEXT", $this->object->prepareTextareaOutput($this->object->getQuestion(), TRUE));
         $errortext = $this->object->createErrorTextOutput($selections);
@@ -349,10 +359,14 @@ class assErrorTextQuestionGUI extends assQuestionGUI implements ilGuiQuestionSco
             $template->setVariable("RESULT_OUTPUT", sprintf($resulttext, $reached_points));
         }
 
+        $style = 'style= "direction:' . $this->object->getTextDirection().';';
         if ($this->object->getTextSize() >= 10) {
-            $template->setVariable("STYLE", " style=\"font-size: " . $this->object->getTextSize() . "%;\"");
+            $style .= ' font-size: ' . $this->object->getTextSize() . '%;';
         }
+        $style .= '"';
 
+        $template->setVariable("STYLE", $style);
+        $template->setVariable("DIR", $this->object->getTextDirection());
         if ($show_question_text == true) {
             $template->setVariable("QUESTIONTEXT", $this->object->prepareTextareaOutput($this->object->getQuestion(), TRUE));
         }

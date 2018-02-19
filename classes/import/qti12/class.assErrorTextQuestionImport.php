@@ -49,6 +49,7 @@ class assErrorTextQuestionImport extends assQuestionImport
         $this->object->setPointsWrong($item->getMetadataEntry("points_wrong"));
         $this->object->setErrorText($item->getMetadataEntry("errortext"));
         $this->object->setTextSize($item->getMetadataEntry("textsize"));
+        $this->object->setTextDirection($item->getMetadataEntry("text_direction"));
         $errordata = unserialize($item->getMetadataEntry("errordata"));
         if (is_array($errordata)) {
             foreach ($errordata as $data) {

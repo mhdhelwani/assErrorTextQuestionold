@@ -26,6 +26,7 @@ class assErrorTextQuestion extends assQuestion implements ilObjQuestionScoringAd
     protected $textsize;
     protected $errordata;
     protected $points_wrong;
+    protected $text_direction;
 
     /**
      * assErrorTextQuestion constructor
@@ -48,6 +49,7 @@ class assErrorTextQuestion extends assQuestion implements ilObjQuestionScoringAd
         parent::__construct($title, $comment, $author, $owner, $question);
         $this->errortext = '';
         $this->textsize = 100.0;
+        $this->text_direction = "LTR";
         $this->errordata = array();
     }
 
@@ -104,7 +106,6 @@ class assErrorTextQuestion extends assQuestion implements ilObjQuestionScoringAd
         );
 
         $sequence = 0;
-        var_dump($this->errordata);
         foreach ($this->errordata as $object) {
             $next_id = $ilDB->nextId('il_qpl_a_errortextq');
             $ilDB->manipulateF(
@@ -139,13 +140,14 @@ class assErrorTextQuestion extends assQuestion implements ilObjQuestionScoringAd
             array($this->getId())
         );
 
-        $ilDB->manipulateF("INSERT INTO " . $this->getAdditionalTableName() . " (question_fi, errortext, textsize, points_wrong) VALUES (%s, %s, %s, %s)",
-            array("integer", "text", "float", "float"),
+        $ilDB->manipulateF("INSERT INTO " . $this->getAdditionalTableName() . " (question_fi, errortext, textsize, points_wrong, text_direction) VALUES (%s, %s, %s, %s, %s)",
+            array("integer", "text", "float", "float", "text"),
             array(
                 $this->getId(),
                 $this->getErrorText(),
                 $this->getTextSize(),
-                $this->getPointsWrong()
+                $this->getPointsWrong(),
+                $this->getTextDirection()
             )
         );
     }
@@ -183,6 +185,7 @@ class assErrorTextQuestion extends assQuestion implements ilObjQuestionScoringAd
             $this->setTextSize($data["textsize"]);
             $this->setPointsWrong($data["points_wrong"]);
             $this->setEstimatedWorkingTime(substr($data["working_time"], 0, 2), substr($data["working_time"], 3, 2), substr($data["working_time"], 6, 2));
+            $this->setTextDirection($data["text_direction"]);
 
             try {
                 $this->setAdditionalContentEditingMode($data['add_cont_edit_mode']);
@@ -453,19 +456,19 @@ class assErrorTextQuestion extends assQuestion implements ilObjQuestionScoringAd
 
         $r_passage = '/(<span class="sel">|<\/span>)/';
         $textSplitArray = preg_split($r_passage, $a_text, 0, PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_OFFSET_CAPTURE);
+        $text = "";
 
         $selected = array();
-        $chrCntDecrease = 0;
         $counter = 0;
-
         for ($i = 0; $i < count($textSplitArray); $i++) {
             if ($textSplitArray[$i][0] == "</span>" && $textSplitArray[$i - 2][0] == '<span class="sel">') {
+                $text .= $textSplitArray[$i - 3][0];
                 $selected[$counter]["selectedText"] = $textSplitArray[$i - 1][0];
-                $selected[$counter]["selectionStart"] = $textSplitArray[$i - 2][1] - $chrCntDecrease;
+                $selected[$counter]["selectionStart"] = ilStr::strLen($text);
                 $selected[$counter]["selectionLength"] = ilstr::strLen($textSplitArray[$i - 1][0]);
 
                 $counter++;
-                $chrCntDecrease += 25;
+                $text .= $textSplitArray[$i - 1][0];
             }
         }
         return $selected;
@@ -640,9 +643,8 @@ class assErrorTextQuestion extends assQuestion implements ilObjQuestionScoringAd
 
         $r_passage = "/(#|\\(\\(|\\)\\))/";
 
-        $errorTextSplitArray = preg_split($r_passage, $a_text, 0, PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_OFFSET_CAPTURE);
+        $errorTextSplitArray = preg_split($r_passage, $a_text, -1, PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_OFFSET_CAPTURE);
         $errorsFound = array();
-        $chrCntDecrease = 0;
         $counter = 0;
         $text = "";
 
@@ -650,22 +652,20 @@ class assErrorTextQuestion extends assQuestion implements ilObjQuestionScoringAd
             if (in_array($errorTextSplitArray[$i][0], ["#", "((", "))"])) {
                 if (ilStr::substr($errorTextSplitArray[$i - 1][0], ilStr::strLen($errorTextSplitArray[$i - 1][0]) - 1) == "\\") {
                     $text .= ilStr::substr($errorTextSplitArray[$i - 1][0], 0, ilStr::strLen($errorTextSplitArray[$i - 1][0]) - 1) . $errorTextSplitArray[$i][0];
-                    $chrCntDecrease++;
                 } else {
+                    $text .= $errorTextSplitArray[$i - 1][0];
                     if ($errorTextSplitArray[$i][0] == "#") {
                         $errorWord = preg_split("/[\s]/", $errorTextSplitArray[$i + 1][0])[0];
                         $errorsFound[$counter]["errorText"] = $errorWord;
-                        $errorsFound[$counter]["errorStart"] = $errorTextSplitArray[$i][1] - $chrCntDecrease;
+                        $errorsFound[$counter]["errorStart"] = ilStr::strLen($text);
                         $errorsFound[$counter]["errorLength"] = ilStr::strLen($errorWord);
                         $counter++;
                     } else if ($errorTextSplitArray[$i][0] == "((") {
                         $errorsFound[$counter]["errorText"] = $errorTextSplitArray[$i + 1][0];
-                        $errorsFound[$counter]["errorStart"] = $errorTextSplitArray[$i][1] - $chrCntDecrease;
+                        $errorsFound[$counter]["errorStart"] = ilStr::strLen($text);
                         $errorsFound[$counter]["errorLength"] = ilStr::strLen($errorTextSplitArray[$i + 1][0]);
                         $counter++;
                     }
-                    $text .= $errorTextSplitArray[$i - 1][0];
-                    $chrCntDecrease += ilStr::strLen($errorTextSplitArray[$i][0]);
                 }
             }
         }
@@ -864,6 +864,30 @@ class assErrorTextQuestion extends assQuestion implements ilObjQuestionScoringAd
     }
 
     /**
+     * Set text direction
+     *
+     * @return string Text direction
+     */
+    public function getTextDirection()
+    {
+        return $this->text_direction;
+    }
+
+    /**
+     * Set text direction
+     *
+     * @param string $a_value text direction
+     */
+    public function setTextDirection($a_value)
+    {
+        // in self-assesment-mode value should always be set (and must not be null)
+        if ($a_value === null) {
+            $a_value = 100;
+        }
+        $this->text_direction = $a_value;
+    }
+
+    /**
      * Get wrong points
      *
      * @return double Points for wrong selection
@@ -895,6 +919,9 @@ class assErrorTextQuestion extends assQuestion implements ilObjQuestionScoringAd
             case "textsize":
                 return $this->getTextSize();
                 break;
+            case "text_direction":
+                return $this->getTextDirection();
+                break;
             case "points_wrong":
                 return $this->getPointsWrong();
                 break;
@@ -915,6 +942,9 @@ class assErrorTextQuestion extends assQuestion implements ilObjQuestionScoringAd
                 break;
             case "textsize":
                 $this->setTextSize($value);
+                break;
+            case "text_direction":
+                $this->setTextDirection($value);
                 break;
             case "points_wrong":
                 $this->setPointsWrong($value);

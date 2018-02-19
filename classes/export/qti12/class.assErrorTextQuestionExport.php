@@ -69,6 +69,8 @@ class assErrorTextQuestionExport extends assQuestionExport
         $a_xml_writer->xmlStartTag("qtimetadatafield");
         $a_xml_writer->xmlElement("fieldlabel", NULL, "textsize");
         $a_xml_writer->xmlElement("fieldentry", NULL, $this->object->getTextSize());
+        $a_xml_writer->xmlElement("fieldlabel", NULL, "text_direction");
+        $a_xml_writer->xmlElement("fieldentry", NULL, $this->object->getTextDirection());
         $a_xml_writer->xmlEndTag("qtimetadatafield");
         $a_xml_writer->xmlStartTag("qtimetadatafield");
         $a_xml_writer->xmlElement("fieldlabel", NULL, "errordata");

@@ -38,6 +38,9 @@ if (!$ilDB->tableExists("il_qpl_qst_errortextq")) {
         ),
         "points_wrong" => array(
             "type" => "float", "notnull" => true, "default" => -1.0
+        ),
+        "text_direction" => array(
+            "type" => "text", "length" => 10, "notnull" => true
         )
     );
 
