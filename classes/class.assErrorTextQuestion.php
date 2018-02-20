@@ -455,20 +455,20 @@ class assErrorTextQuestion extends assQuestion implements ilObjQuestionScoringAd
         include_once "./Services/Utilities/classes/class.ilStr.php";
 
         $r_passage = '/(<span class="sel">|<\/span>)/';
-        $textSplitArray = preg_split($r_passage, $a_text, 0, PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_OFFSET_CAPTURE);
+        $textSplitArray = preg_split($r_passage, $a_text, -1, PREG_SPLIT_DELIM_CAPTURE);
         $text = "";
 
         $selected = array();
         $counter = 0;
         for ($i = 0; $i < count($textSplitArray); $i++) {
-            if ($textSplitArray[$i][0] == "</span>" && $textSplitArray[$i - 2][0] == '<span class="sel">') {
-                $text .= $textSplitArray[$i - 3][0];
-                $selected[$counter]["selectedText"] = $textSplitArray[$i - 1][0];
+            if ($textSplitArray[$i] == "</span>" && $textSplitArray[$i - 2] == '<span class="sel">') {
+                $text .= $textSplitArray[$i - 3];
+                $selected[$counter]["selectedText"] = $textSplitArray[$i - 1];
                 $selected[$counter]["selectionStart"] = ilStr::strLen($text);
-                $selected[$counter]["selectionLength"] = ilstr::strLen($textSplitArray[$i - 1][0]);
+                $selected[$counter]["selectionLength"] = ilstr::strLen($textSplitArray[$i - 1]);
 
                 $counter++;
-                $text .= $textSplitArray[$i - 1][0];
+                $text .= $textSplitArray[$i - 1];
             }
         }
         return $selected;
@@ -643,33 +643,33 @@ class assErrorTextQuestion extends assQuestion implements ilObjQuestionScoringAd
 
         $r_passage = "/(#|\\(\\(|\\)\\))/";
 
-        $errorTextSplitArray = preg_split($r_passage, $a_text, -1, PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_OFFSET_CAPTURE);
+        $errorTextSplitArray = preg_split($r_passage, $a_text, -1, PREG_SPLIT_DELIM_CAPTURE);
         $errorsFound = array();
         $counter = 0;
         $text = "";
 
         for ($i = 0; $i < count($errorTextSplitArray); $i++) {
-            if (in_array($errorTextSplitArray[$i][0], ["#", "((", "))"])) {
-                if (ilStr::substr($errorTextSplitArray[$i - 1][0], ilStr::strLen($errorTextSplitArray[$i - 1][0]) - 1) == "\\") {
-                    $text .= ilStr::substr($errorTextSplitArray[$i - 1][0], 0, ilStr::strLen($errorTextSplitArray[$i - 1][0]) - 1) . $errorTextSplitArray[$i][0];
+            if (in_array($errorTextSplitArray[$i], ["#", "((", "))"])) {
+                if (ilStr::substr($errorTextSplitArray[$i - 1][0], ilStr::strLen($errorTextSplitArray[$i - 1]) - 1) == "\\") {
+                    $text .= ilStr::substr($errorTextSplitArray[$i - 1], 0, ilStr::strLen($errorTextSplitArray[$i - 1]) - 1) . $errorTextSplitArray[$i];
                 } else {
-                    $text .= $errorTextSplitArray[$i - 1][0];
+                    $text .= $errorTextSplitArray[$i - 1];
                     if ($errorTextSplitArray[$i][0] == "#") {
-                        $errorWord = preg_split("/[\s]/", $errorTextSplitArray[$i + 1][0])[0];
+                        $errorWord = preg_split("/[\s]/", $errorTextSplitArray[$i + 1])[0];
                         $errorsFound[$counter]["errorText"] = $errorWord;
                         $errorsFound[$counter]["errorStart"] = ilStr::strLen($text);
                         $errorsFound[$counter]["errorLength"] = ilStr::strLen($errorWord);
                         $counter++;
-                    } else if ($errorTextSplitArray[$i][0] == "((") {
-                        $errorsFound[$counter]["errorText"] = $errorTextSplitArray[$i + 1][0];
+                    } else if ($errorTextSplitArray[$i] == "((") {
+                        $errorsFound[$counter]["errorText"] = $errorTextSplitArray[$i + 1];
                         $errorsFound[$counter]["errorStart"] = ilStr::strLen($text);
-                        $errorsFound[$counter]["errorLength"] = ilStr::strLen($errorTextSplitArray[$i + 1][0]);
+                        $errorsFound[$counter]["errorLength"] = ilStr::strLen($errorTextSplitArray[$i + 1]);
                         $counter++;
                     }
                 }
             }
         }
-        $text .= $errorTextSplitArray[count($errorTextSplitArray) - 1][0];
+        $text .= $errorTextSplitArray[count($errorTextSplitArray) - 1];
 
         return [$errorsFound, $text];
     }
