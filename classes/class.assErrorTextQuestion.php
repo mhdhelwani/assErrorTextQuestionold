@@ -650,7 +650,7 @@ class assErrorTextQuestion extends assQuestion implements ilObjQuestionScoringAd
 
         for ($i = 0; $i < count($errorTextSplitArray); $i++) {
             if (in_array($errorTextSplitArray[$i], ["#", "((", "))"])) {
-                if (ilStr::substr($errorTextSplitArray[$i - 1][0], ilStr::strLen($errorTextSplitArray[$i - 1]) - 1) == "\\") {
+                if (ilStr::substr($errorTextSplitArray[$i - 1], ilStr::strLen($errorTextSplitArray[$i - 1]) - 1, 1) == "\\") {
                     $text .= ilStr::substr($errorTextSplitArray[$i - 1], 0, ilStr::strLen($errorTextSplitArray[$i - 1]) - 1) . $errorTextSplitArray[$i];
                 } else {
                     $text .= $errorTextSplitArray[$i - 1];
@@ -727,7 +727,7 @@ class assErrorTextQuestion extends assQuestion implements ilObjQuestionScoringAd
                     '<span class="sel">' .
                     $selection["selectedText"] .
                     "</span>" . $img .
-                    ilStr::subStr($text, $selection["selectionStart"] + $selection["selectionLength"]);
+                    ilStr::subStr($text, $selection["selectionStart"] + $selection["selectionLength"], ilStr::strLen($text));
             }
         }
 
@@ -743,7 +743,7 @@ class assErrorTextQuestion extends assQuestion implements ilObjQuestionScoringAd
                 '#' .
                 $selection["selectedText"] .
                 "#" .
-                ilStr::subStr($text, $selection["selectionStart"] + $selection["selectionLength"]);
+                ilStr::subStr($text, $selection["selectionStart"] + $selection["selectionLength"], ilStr::strLen($text));
         }
         ilUtil::prepareFormOutput($text);
 
