@@ -359,7 +359,7 @@ class assErrorTextQuestionGUI extends assQuestionGUI implements ilGuiQuestionSco
             $template->setVariable("RESULT_OUTPUT", sprintf($resulttext, $reached_points));
         }
 
-        $style = 'style= "direction:' . $this->object->getTextDirection().';';
+        $style = 'style= "direction:' . $this->object->getTextDirection() . ';';
         if ($this->object->getTextSize() >= 10) {
             $style .= ' font-size: ' . $this->object->getTextSize() . '%;';
         }
@@ -547,21 +547,21 @@ class assErrorTextQuestionGUI extends assQuestionGUI implements ilGuiQuestionSco
      */
     public function getAggregatedAnswersView($relevant_answers)
     {
-        echo "getAggregatedAnswersView";
-        die();
-        $errortext = $this->object->getErrorText();
-
         $passdata = array(); // Regroup answers into units of passes.
         foreach ($relevant_answers as $answer_chosen) {
-            $passdata[$answer_chosen['active_fi'] . '-' . $answer_chosen['pass']][$answer_chosen['value2']][] = $answer_chosen['value1'];
+            $answerValue2 = explode(",", $answer_chosen['value2']);
+            $passdata[$answer_chosen['active_fi'] . '-' . $answer_chosen['pass']][$answerValue2[0]] = ["selectionStart" => $answerValue2[0], "selectionLength" => $answerValue2[1], "selectedText" => $answer_chosen['value1']];
         }
 
         $html = '';
         foreach ($passdata as $key => $pass) {
+            krsort($pass);
             $passdata[$key] = $this->object->createErrorTextOutput($pass);
             $html .= $passdata[$key] . '<hr /><br />';
         }
-
+        if ($this->object->getTextDirection() ==="RTL") {
+            $html = "<div style='direction:RTL;'>" . $html . "</div>";
+        }
         return $html;
     }
 }
