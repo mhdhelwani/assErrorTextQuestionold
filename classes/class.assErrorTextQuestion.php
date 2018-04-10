@@ -393,9 +393,11 @@ class assErrorTextQuestion extends assQuestion implements ilObjQuestionScoringAd
 
     public function calculateReachedPointsFromPreviewSession(ilAssQuestionPreviewSession $previewSession)
     {
-        echo "calculateReachedPointsFromPreviewSession";
-        die();
-        return $this->getPointsForSelectedPositions($previewSession->getParticipantsSolution());
+        $selections = $previewSession->getParticipantsSolution();
+        for ($i = 0; $i < count($selections); $i++) {
+            $selections[$i] = $selections[$i]["selectionStart"] . "," . $selections[$i]["selectionLength"];
+        }
+        return $this->getPointsForSelectedPositions($selections);
     }
 
     /**
@@ -478,14 +480,11 @@ class assErrorTextQuestion extends assQuestion implements ilObjQuestionScoringAd
     {
         if (strlen($_POST["qst_" . $this->getId()])) {
             $selections = $this->getSelectedFromText($_POST["qst_{$this->getId()}"]);
-            for ($i = 0; $i < count($selections); $i++) {
-                $selections[$i] = $selections[$i]["selectionStart"] . "," . $selections[$i]["selectionLength"];
-            }
         } else {
-            $selection = array();
+            $selections = array();
         }
 
-        $previewSession->setParticipantsSolution($selection);
+        $previewSession->setParticipantsSolution($selections);
     }
 
     /**

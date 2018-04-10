@@ -1,4 +1,4 @@
-assErrorTextPlugin
+assErrorTextQuestionPlugin
 ============
 
 Copy the main folder to Customizing/global/plugins/Modules/testQuestionPool/Questions/
