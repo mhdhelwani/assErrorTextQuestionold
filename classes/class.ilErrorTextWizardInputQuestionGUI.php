@@ -51,8 +51,8 @@ class ilErrorTextWizardInputQuestionGUI extends ilTextInputGUI
                         $key,
                         $a_value['value'][$idx],
                         str_replace(",", ".", $a_value['points'][$idx]),
-                        $a_value['start_position'][$idx],
-                        $a_value['error_length'][$idx]));
+                        $a_value['positions'][$idx],
+                        $a_value['error_type'][$idx]));
                 }
             }
         }
@@ -284,14 +284,14 @@ class ilErrorTextWizardInputQuestionGUI extends ilTextInputGUI
                     $tpl->setVariable("PROPERTY_VALUE", ilUtil::prepareFormOutput($value->points));
                     $tpl->parseCurrentBlock();
                 }
-                if (strlen($value->start_position)) {
-                    $tpl->setCurrentBlock("prop_start_position_propval");
-                    $tpl->setVariable("PROPERTY_VALUE", ilUtil::prepareFormOutput($value->start_position));
+                if (strlen($value->positions)) {
+                    $tpl->setCurrentBlock("prop_positions_propval");
+                    $tpl->setVariable("PROPERTY_VALUE", ilUtil::prepareFormOutput($value->positions));
                     $tpl->parseCurrentBlock();
                 }
-                if (strlen($value->error_length)) {
-                    $tpl->setCurrentBlock("prop_error_length_propval");
-                    $tpl->setVariable("PROPERTY_VALUE", ilUtil::prepareFormOutput($value->error_length));
+                if (strlen($value->error_type)) {
+                    $tpl->setCurrentBlock("prop_error_type_propval");
+                    $tpl->setVariable("PROPERTY_VALUE", ilUtil::prepareFormOutput($value->error_type));
                     $tpl->parseCurrentBlock();
                 }
             }

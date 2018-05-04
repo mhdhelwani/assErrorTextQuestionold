@@ -73,6 +73,14 @@ class assErrorTextQuestionGUI extends assQuestionGUI implements ilGuiQuestionSco
         if (count($this->object->getErrorData()) || $checkonly) {
             $this->populateAnswerSpecificFormPart($form);
         }
+        // points for wrong selection
+        $points_wrong = new ilNumberInputGUI($this->lng->txt("points_wrong"), "points_wrong");
+        $points_wrong->allowDecimals(true);
+        $points_wrong->setValue($this->object->getPointsWrong());
+        $points_wrong->setInfo($this->lng->txt("points_wrong_info"));
+        $points_wrong->setSize(6);
+        $points_wrong->setRequired(true);
+        $form->addItem($points_wrong);
 
         $this->populateTaxonomyFormSection($form);
 
@@ -84,6 +92,12 @@ class assErrorTextQuestionGUI extends assQuestionGUI implements ilGuiQuestionSco
         if ($save) {
             $form->setValuesByPost();
             $errors = !$form->checkInput();
+            if($form->getItemByPostVar("text_direction")->getValue() == "RTL" &&
+                $form->getItemByPostVar("error_type")->getValue() == "C"){
+                ilUtil::sendFailure($this->object->getPlugin()->txt('rtl_char_error_message'), TRUE);
+                $errors = true;
+            }
+
             $form->setValuesByPost(); // again, because checkInput now performs the whole stripSlashes handling and we need this if we don't want to have duplication of backslashes
             if ($errors) $checkonly = false;
         }
@@ -110,14 +124,6 @@ class assErrorTextQuestionGUI extends assQuestionGUI implements ilGuiQuestionSco
         $errordata->setValues($this->object->getErrorData());
         $form->addItem($errordata);
 
-        // points for wrong selection
-        $points_wrong = new ilNumberInputGUI($this->lng->txt("points_wrong"), "points_wrong");
-        $points_wrong->allowDecimals(true);
-        $points_wrong->setValue($this->object->getPointsWrong());
-        $points_wrong->setInfo($this->lng->txt("points_wrong_info"));
-        $points_wrong->setSize(6);
-        $points_wrong->setRequired(true);
-        $form->addItem($points_wrong);
         return $form;
     }
 
@@ -132,11 +138,16 @@ class assErrorTextQuestionGUI extends assQuestionGUI implements ilGuiQuestionSco
         $langDirection->setValue($this->object->getTextDirection());
         $form->addItem($langDirection);
 
+        $errorType = new ilSelectInputGUI($this->plugin->txt("error_type"), "error_type");
+        $errorType->setOptions(["W" => $this->plugin->txt("error_type_word"), "C" => $this->plugin->txt("error_type_char")]);
+        $errorType->setValue($this->object->getErrorType());
+        $form->addItem($errorType);
+
         // errortext
         $errortext = new ilTextAreaInputGUI($this->lng->txt("errortext"), "errortext");
         $errortext->setValue($this->object->getErrorText());
         $errortext->setRequired(TRUE);
-        $errortext->setInfo($this->lng->txt("errortext_info"));
+        $errortext->setInfo($this->plugin->txt("errortext_info"));
         $errortext->setRows(10);
         $errortext->setCols(80);
         $form->addItem($errortext);
@@ -187,14 +198,14 @@ class assErrorTextQuestionGUI extends assQuestionGUI implements ilGuiQuestionSco
 
     public function writeAnswerSpecificPostData(ilPropertyFormGUI $form)
     {
+        $this->object->flushErrorData();
         if (is_array($_POST['errordata']['key'])) {
-            $this->object->flushErrorData();
             foreach ($_POST['errordata']['key'] as $idx => $val) {
                 $this->object->addErrorData($val,
                     $_POST['errordata']['value'][$idx],
                     $_POST['errordata']['points'][$idx],
-                    $_POST['errordata']['start_position'][$idx],
-                    $_POST['errordata']['error_length'][$idx]
+                    $_POST['errordata']['positions'][$idx],
+                    $_POST['errordata']['error_type'][$idx]
                 );
             }
         }
@@ -210,6 +221,7 @@ class assErrorTextQuestionGUI extends assQuestionGUI implements ilGuiQuestionSco
             $points_wrong = -1.0;
         $this->object->setPointsWrong($points_wrong);
         $this->object->setTextDirection($_POST["text_direction"]);
+        $this->object->setErrorType($_POST["error_type"]);
 
         if (!$this->object->getSelfAssessmentEditingMode()) {
             $this->object->setTextSize($_POST["textsize"]);
@@ -236,12 +248,8 @@ class assErrorTextQuestionGUI extends assQuestionGUI implements ilGuiQuestionSco
         $selections = array();
         if (is_array($solutions)) {
             foreach ($solutions as $solution) {
-                $selectionPosition = explode(",", $solution["value2"]);
-
-                $selections[$selectionPosition[0]] = [
-                    "selectedText" => $solution['value1'],
-                    "selectionStart" => $selectionPosition[0],
-                    "selectionLength" => $selectionPosition[1]];
+                $selections[$solution['value1']] = [
+                    "position" => $solution['value1']];
             }
             krsort($selections);
         }
@@ -258,7 +266,7 @@ class assErrorTextQuestionGUI extends assQuestionGUI implements ilGuiQuestionSco
         $this->ctrl->setParameterByClass($this->getTargetGuiClass(), 'errorvalue', '');
         $template->setVariable("ERRORTEXT", $errortext);
         $template->setVariable("ERRORTEXT_ID", "qst_" . $this->object->getId());
-        $template->setVariable("ERRORTEXT_VALUE", ilUtil::prepareFormOutput($errortext));
+        $template->setVariable("ERRORTEXT_VALUE", implode(",",array_column($selections, "position")));
 
         $questionoutput = $template->get();
         if (!$show_question_only) {
@@ -266,6 +274,7 @@ class assErrorTextQuestionGUI extends assQuestionGUI implements ilGuiQuestionSco
             $questionoutput = $this->getILIASPage($questionoutput);
         }
         $this->tpl->addJavascript($this->plugin->getDirectory() . "/js/errortextquestion.js");
+        $this->tpl->addCss($this->plugin->getDirectory() . "/css/errortextquestion.css");
         $questionoutput = $template->get();
         $pageoutput = $this->outQuestionPage("", $is_postponed, $active_id, $questionoutput);
         return $pageoutput;
@@ -297,6 +306,7 @@ class assErrorTextQuestionGUI extends assQuestionGUI implements ilGuiQuestionSco
             $questionoutput = $this->getILIASPage($questionoutput);
         }
         $this->tpl->addJavascript($this->plugin->getDirectory() . "/js/errortextquestion.js");
+        $this->tpl->addCss($this->plugin->getDirectory() . "/css/errortextquestion.css");
         return $questionoutput;
     }
 
@@ -333,19 +343,13 @@ class assErrorTextQuestionGUI extends assQuestionGUI implements ilGuiQuestionSco
 
         $selections = array();
         if (($active_id > 0) && (!$show_correct_solution)) {
-
             /* Retrieve tst_solutions entries. */
             $reached_points = $this->object->getReachedPoints($active_id, $pass);
             $solutions =& $this->object->getSolutionValues($active_id, $pass);
-            $selections = array();
             if (is_array($solutions)) {
                 foreach ($solutions as $solution) {
-                    $selectionPosition = explode(",", $solution["value2"]);
-
-                    $selections[$selectionPosition[0]] = [
-                        "selectedText" => $solution['value1'],
-                        "selectionStart" => $selectionPosition[0],
-                        "selectionLength" => $selectionPosition[1]];
+                    $selections[$solution['value1']] = [
+                        "position" => $solution['value1']];
                 }
                 krsort($selections);
             }
@@ -359,7 +363,7 @@ class assErrorTextQuestionGUI extends assQuestionGUI implements ilGuiQuestionSco
             $template->setVariable("RESULT_OUTPUT", sprintf($resulttext, $reached_points));
         }
 
-        $style = 'style= "direction:' . $this->object->getTextDirection() . ';';
+        $style = 'style= "white-space:pre-wrap; direction:' . $this->object->getTextDirection() . ';';
         if ($this->object->getTextSize() >= 10) {
             $style .= ' font-size: ' . $this->object->getTextSize() . '%;';
         }
@@ -412,7 +416,6 @@ class assErrorTextQuestionGUI extends assQuestionGUI implements ilGuiQuestionSco
 
         $matchedIndexes = array();
 
-        $i = 0;
         foreach ($errorItems as $index => $answer) {
             $ordinal = $index + 1;
 
@@ -425,7 +428,7 @@ class assErrorTextQuestionGUI extends assQuestionGUI implements ilGuiQuestionSco
                     continue;
                 }
 
-                if ($ans->start_position == $answer["errorStart"] && $ans->error_length == $answer["errorLength"]) {
+                if ($ans->positions == $answer["positions"]) {
                     $fb = $this->object->feedbackOBJ->getSpecificAnswerFeedbackTestPresentation(
                         $this->object->getId(), $idx
                     );
@@ -549,8 +552,7 @@ class assErrorTextQuestionGUI extends assQuestionGUI implements ilGuiQuestionSco
     {
         $passdata = array(); // Regroup answers into units of passes.
         foreach ($relevant_answers as $answer_chosen) {
-            $answerValue2 = explode(",", $answer_chosen['value2']);
-            $passdata[$answer_chosen['active_fi'] . '-' . $answer_chosen['pass']][$answerValue2[0]] = ["selectionStart" => $answerValue2[0], "selectionLength" => $answerValue2[1], "selectedText" => $answer_chosen['value1']];
+            $passdata[$answer_chosen['active_fi'] . '-' . $answer_chosen['pass']][$answer_chosen["value1"]] = ["position" => $answer_chosen["value1"]];
         }
 
         $html = '';
@@ -559,7 +561,7 @@ class assErrorTextQuestionGUI extends assQuestionGUI implements ilGuiQuestionSco
             $passdata[$key] = $this->object->createErrorTextOutput($pass);
             $html .= $passdata[$key] . '<hr /><br />';
         }
-        if ($this->object->getTextDirection() ==="RTL") {
+        if ($this->object->getTextDirection() === "RTL") {
             $html = "<div style='direction:RTL;'>" . $html . "</div>";
         }
         return $html;

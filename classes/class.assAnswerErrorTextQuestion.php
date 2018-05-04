@@ -14,30 +14,29 @@ class assAnswerErrorTextQuestion
 {
     /**
      * Array consisting of one errortext-answer
-     * E.g. array('text_wrong' => 'Guenther', 'text_correct' => 'Günther', 'points' => 20, 'start_position' => 10, 'error_length' => 4)
+     * E.g. array('text_wrong' => 'Guenther', 'text_correct' => 'Günther', 'points' => 20, 'positions' => 10, 15)
      *
      * @var array Array consisting of one errortext-answer
      */
     protected $arrData;
 
     /**
-     * assAnswerErrorText constructor
+     * assAnswerErrorTextL constructor
      *
      * @param string $text_wrong Wrong text
      * @param string $text_correct Correct text
      * @param double $points Points
-     * @param int $start_position Points
-     * @param int $error_length Points
+     * @param int $positions Positions
      *
      */
-    public function __construct($text_wrong = "", $text_correct = "", $points = 0.0, $start_position = 0, $error_length = 0)
+    public function __construct($text_wrong = "", $text_correct = "", $points = 0.0, $positions = 0, $error_type ="S")
     {
         $this->arrData = array(
             'text_wrong' => $text_wrong,
             'text_correct' => $text_correct,
             'points' => $points,
-			'start_position' => $start_position,
-			'error_length' => $error_length
+			'positions' => $positions,
+			'error_type' => $error_type
 		);
 	}
 
@@ -50,8 +49,8 @@ class assAnswerErrorTextQuestion
             case "text_wrong":
             case "text_correct":
             case "points":
-            case "start_position":
-            case "error_length":
+            case "positions":
+            case "error_type":
                 return $this->arrData[$value];
                 break;
             default:
@@ -69,8 +68,8 @@ class assAnswerErrorTextQuestion
             case "text_wrong":
             case "text_correct":
             case "points":
-            case "start_position":
-            case "error_length":
+            case "positions":
+            case "error_type":
                 $this->arrData[$key] = $value;
                 break;
             default:

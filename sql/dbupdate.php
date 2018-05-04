@@ -41,6 +41,9 @@ if (!$ilDB->tableExists("il_qpl_qst_errortextq")) {
         ),
         "text_direction" => array(
             "type" => "text", "length" => 10, "notnull" => true
+        ),
+        "error_type" => array(
+            "type" => "text", "length" => 1, "notnull" => true
         )
     );
 
@@ -70,11 +73,11 @@ if (!$ilDB->tableExists("il_qpl_a_errortextq")) {
         "sequence" => array(
             "type" => "integer", "length" => 2, "notnull" => true, "default" => 0
         ),
-        "start_position" => array(
-            "type" => "float", "notnull" => true, "default" => 0
+        "positions" => array(
+            "type" => "text", "length" => 256, "notnull" => true, "default" => 0
         ),
-        "error_length" => array(
-            "type" => "float", "notnull" => true, "default" => 0
+        "error_type" => array(
+            "type" => "text", "length" => 1, "notnull" => true
         )
     );
     $ilDB->createTable("il_qpl_a_errortextq", $fields);

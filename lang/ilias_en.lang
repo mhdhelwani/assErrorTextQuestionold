@@ -1,2 +1,7 @@
-assErrorTextQuestion#:#Error Text Question
+assErrorTextQuestion#:#Error Text (Words/Character)
 text_direction#:#Text Direction
+error_type#:#Error Type
+rtl_char_error_message#:#Unfortunately, a character analysis is currently not possible with RTL languages.
+error_type_word#:#Word
+error_type_char#:#Character
+errortext_info#:#Please enter the error text. To mark a word/character as an error please insert a hash sign (#) in front of the word/character. To mark a group of words/characters as an error please encapsulate the words/characters group between double brackets (i.e.: here is ((an example)) of it). If you press the &quot;Analyze Error Text&quot; button, all marked words/characters will be extracted for further processing.
