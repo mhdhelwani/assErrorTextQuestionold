@@ -34,4 +34,8 @@ $().ready(function () {
     $("#text_direction").change(function (e) {
         $("#errortext").parent().attr("dir", $(this).val());
     });
+
+    $("#errortext").change(function (e) {
+        $("#is_error_text_changed").val("1");
+    });
 });

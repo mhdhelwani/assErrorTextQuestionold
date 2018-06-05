@@ -98,6 +98,11 @@ class assErrorTextQuestionGUI extends assQuestionGUI implements ilGuiQuestionSco
                 $errors = true;
             }
 
+            if($form->getItemByPostVar("is_error_text_changed")->getValue() == "1" ){
+                ilUtil::sendFailure($this->object->getPlugin()->txt('is_error_text_changed_message'), TRUE);
+                $errors = true;
+            }
+
             $form->setValuesByPost(); // again, because checkInput now performs the whole stripSlashes handling and we need this if we don't want to have duplication of backslashes
             if ($errors) $checkonly = false;
         }
@@ -143,6 +148,10 @@ class assErrorTextQuestionGUI extends assQuestionGUI implements ilGuiQuestionSco
         $errorType->setValue($this->object->getErrorType());
         $form->addItem($errorType);
 
+        $isErrorTextChanged = new ilHiddenInputGUI("is_error_text_changed");
+        $isErrorTextChanged->setValue(0);
+        $form->addItem($isErrorTextChanged);
+        
         // errortext
         $errortext = new ilTextAreaInputGUI($this->lng->txt("errortext"), "errortext");
         $errortext->setValue($this->object->getErrorText());

@@ -22,13 +22,13 @@
                 {DISABLED_VALUE}/>
             </td>
             <td>
-                <input class="form-control" type="text" class="number" size="5" id="{POINTS_ID}"
+                <input class="form-control number" type="text" size="5" id="{POST_VAR}[points][{ROW_NUMBER}]"
                        name="{POST_VAR}[points][{ROW_NUMBER}]" <!-- BEGIN prop_points_propval -->
                 value="{PROPERTY_VALUE}" <!-- END prop_points_propval -->{DISABLED_POINTS}/>
-                <input class="form-control" type="hidden" class="number" id="{POSITIONS_ID}"
+                <input class="form-control" type="hidden" id="{POST_VAR}[positions][{ROW_NUMBER}]"
                        name="{POST_VAR}[positions][{ROW_NUMBER}]" <!-- BEGIN prop_positions_propval -->
                 value="{PROPERTY_VALUE}" <!-- END prop_positions_propval -->/>
-                <input class="form-control" type="hidden" class="number" id="{ERROR_TYPE_ID}"
+                <input class="form-control" type="hidden" id="{POST_VAR}[error_type][{ROW_NUMBER}]"
                        name="{POST_VAR}[error_type][{ROW_NUMBER}]" <!-- BEGIN prop_error_type_propval -->
                 value="{PROPERTY_VALUE}" <!-- END prop_error_type_propval -->/>
             </td>

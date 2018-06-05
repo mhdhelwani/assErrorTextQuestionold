@@ -14,7 +14,7 @@ class assAnswerErrorTextQuestion
 {
     /**
      * Array consisting of one errortext-answer
-     * E.g. array('text_wrong' => 'Guenther', 'text_correct' => 'Günther', 'points' => 20, 'positions' => 10, 15)
+     * E.g. array('text_wrong' => 'Guenther', 'text_correct' => 'Günther', 'points' => 20, 'positions' => 10, 15, 'error_type' => 'S')
      *
      * @var array Array consisting of one errortext-answer
      */
@@ -27,6 +27,7 @@ class assAnswerErrorTextQuestion
      * @param string $text_correct Correct text
      * @param double $points Points
      * @param int $positions Positions
+     * @param string $error_type Error type
      *
      */
     public function __construct($text_wrong = "", $text_correct = "", $points = 0.0, $positions = 0, $error_type ="S")

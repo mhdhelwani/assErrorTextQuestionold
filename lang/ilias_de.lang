@@ -2,6 +2,7 @@ assErrorTextQuestion#:#Fehler markieren (Worte/Zeichen)
 text_direction#:#Textrichtung
 error_type#:#Fehlertyp
 rtl_char_error_message#:#Eine zeichenweise Analyse ist bei RTL-Sprachen leider derzeit nicht möglich.
+is_error_text_changed_message#:#Sie haben den (Fehler/Worte markieren) Text geändert. Bitte klicken Sie erst auf Textanalysirien und dann speichern.
 error_type_word#:#Wort
 error_type_char#:#Zeichen
-errortext_info#:#Bitte geben Sie einen Text ein. Um ein Wort/Zeichen als fehlerhaft zu markieren, setzen Sie bitte eine Raute (#) direkt davor. Um eine Gruppe von fehlerhaften Wörtern/Zeichen zu definieren, umklammern Sie diese mit doppelten Klammern: Dies ist ((ein Beispiel)). Klicken Sie auf die Schaltfläche &quot;Text analysieren&quot;, damit die Markierungen für die weitere Bearbeitung extrahiert werden.
+errortext_info#:#Bitte geben Sie einen Text ein. Um ein Wort/Zeichen als fehlerhaft zu markieren, setzen Sie bitte eine Raute (#) direkt davor, wie #hier. Um eine Gruppe von fehlerhaften Wörtern/Zeichen zu definieren, umklammern Sie diese mit doppelten Klammern: Dies ist ((ein Beispiel)). Möchten Sie Raute oder Doppelklammer als reguläres Zeichen im Text verwenden, bitte mit vorangestelltem &quot;\&quot; markieren, also z.B. &quot;\# 1&quot;.<br/>Klicken Sie auf die Schaltfläche &quot;Text analysieren&quot;, damit die Markierungen für die weitere Bearbeitung extrahiert werden.
